@@ -1,0 +1,5 @@
+google-cloud-aiplatform[agent_engines,adk]
+google-generativeai>=0.8.5
+commitizen>=4.6.0
+pre-commit>=4.2.0
+ruff>=0.11.8
