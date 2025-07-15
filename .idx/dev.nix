@@ -11,6 +11,8 @@
     pkgs.python3Packages.virtualenv
     pkgs.pipx
     pkgs.commitizen
+    pkgs.python3Packages.pdm-backend
+    pkgs.pdm
   ];
 
   # Sets environment variables in the workspace
@@ -19,22 +21,25 @@
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
       # "vscodevim.vim"
+      "charliermarsh.ruff"
+      "ms-python.debugpy"
+      "ms-python.python"
     ];
 
     # Enable previews
     previews = {
-      enable = false;
+      enable = true;
       previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
+        web = {
+          # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
+          # and show it in IDX's web preview panel
+          command = ["pdm" "run" "serve"];
+          manager = "web";
+          env = {
+            # Environment variables to set for your server
+            UVICORN_PORT = "$PORT";
+          };
+        };
       };
     };
 
@@ -42,7 +47,7 @@
     workspace = {
       # Runs when a workspace is first created
       onCreate = {
-        install-deps="pip install --upgrade -r requirements.txt";
+        pdm-init="pdm init";
       };
       # Runs when the workspace is (re)started
       onStart = {
