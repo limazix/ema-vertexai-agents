@@ -9,7 +9,7 @@ import os
 from google.adk.agents import LlmAgent
 from google.adk.planners import PlanReActPlanner
 
-from .sub_agents import data_scientist_agent, electric_engineer_agent
+from .sub_agents import data_scientist_agent, electric_engineer_agent, reviewer_agent
 
 root_agent = LlmAgent(
     name="CoordinatorAgent",
@@ -67,6 +67,6 @@ root_agent = LlmAgent(
         Generate an useful and contextualized answer with relevance to the user, using the language specified by {language_code?} (default to Brazilian Portuguese if not specified or if the language is not well-supported for this technical domain).
 
     """,
-    sub_agents=[data_scientist_agent, electric_engineer_agent],
+    sub_agents=[data_scientist_agent, electric_engineer_agent, reviewer_agent],
     output_key="coordinator_text",
 )
