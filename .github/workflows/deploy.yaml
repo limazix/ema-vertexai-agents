@@ -45,8 +45,8 @@ jobs:
     - name: Set up gcloud authentication
       uses: google-github-actions/auth@v2
       with:
-        workload_identity_provider: 'projects/$PROJECT_ID/locations/$PROJECT_LOCATION/workloadIdentityPools/github-pool/providers/github-provider'
-        service_account: ${SERVICE_ACCOUNT_EMAIL}
+        workload_identity_provider: 'projects/${{ PROJECT_ID }}/locations/${{ PROJECT_LOCATION }}/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: '${{ SERVICE_ACCOUNT_EMAIL }}'
 
     - name: Create GCP Workload Identity Provider if it doesn't exist
       id: create_provider
@@ -59,7 +59,7 @@ jobs:
             --display-name="Github provider" \
             --attribute-mapping="google.subject=assertion.sub,literal.runner_id=assertion.runner_id,literal.runner_name=assertion.runner_name,literal.runner_temp_dir=assertion.runner_temp_dir,literal.repository=assertion.repository,literal.actor=assertion.actor,literal.branch=assertion.ref,literal.commit_sha=assertion.sha,literal.repository_owner=assertion.repository_owner" \
             --issuer-uri="https://token.actions.githubusercontent.com" \
-            --attribute-condition="assertion.repository_owner=='$PROJECT_REPOSITORY_OWNER' && assertion.repository=='$PROJECT_REPOSITORY'"
+            --attribute-condition="assertion.repository_owner=='${{ PROJECT_REPOSITORY_OWNER }}' && assertion.repository=='${{ PROJECT_REPOSITORY }}'"
         else
           echo "GCP Workload Identity Provider 'github-provider' already exists."
         fi
