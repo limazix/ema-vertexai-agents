@@ -1,0 +1,68 @@
+name: Deploy to Vertex AI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${GOOGLE_PROJECT_ID} # Replace with your GCP Project ID
+      PROJECT_LOCATION: ${GOOGLE_PROJECT_LOCATION} # Replace with your desired GCP location
+      PROJECT_REPOSITORY_OWNER: ${PROJECT_REPOSITORY_OWNER} # Replace with your GitHub username
+      PROJECT_REPOSITORY: ${PROJECT_REPOSITORY}
+      SERVICE_ACCOUNT_EMAIL: ${SERVICE_ACCOUNT_EMAIL}
+      GOOGLE_STORAGE_BUCKET: ${GOOGLE_STORAGE_BUCKET}
+      LLM_MODEL_NAME: ${LLM_MODEL_NAME}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      BQ_DATASET_NAME: ${BQ_DATASET_NAME}
+      BQ_TABLE_NAME: ${BQ_TABLE_NAME}
+      GOOGLE_GENAI_USE_VERTEXAI: ${GOOGLE_GENAI_USE_VERTEXAI}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install PDM
+      run: |
+        curl -L https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: pdm install --no-self
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+
+    - name: Set up gcloud authentication
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: 'projects/$PROJECT_ID/locations/$PROJECT_LOCATION/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'your-service-account-email@your-gcp-project-id.iam.gserviceaccount.com' # Replace with your Service Account email
+
+    - name: Create GCP Workload Identity Provider if it doesn't exist
+      id: create_provider
+      run: |
+        if ! gcloud iam workload-identity-pools providers list --project=$PROJECT_ID --location=$PROJECT_LOCATION --workload-identity-pool=github-pool | grep -q "github-provider"; then
+          gcloud iam workload-identity-pools providers create-oidc github-provider \
+            --project=$PROJECT_ID \
+            --location=$PROJECT_LOCATION \
+            --workload-identity-pool=github-pool \
+            --display-name="Github provider" \
+            --attribute-mapping="google.subject=assertion.sub,literal.runner_id=assertion.runner_id,literal.runner_name=assertion.runner_name,literal.runner_temp_dir=assertion.runner_temp_dir,literal.repository=assertion.repository,literal.actor=assertion.actor,literal.branch=assertion.ref,literal.commit_sha=assertion.sha,literal.repository_owner=assertion.repository_owner" \
+            --issuer-uri="https://token.actions.githubusercontent.com" \
+            --attribute-condition="assertion.repository_owner=='$PROJECT_REPOSITORY_OWNER' && assertion.repository=='$PROJECT_REPOSITORY'"
+        else
+          echo "GCP Workload Identity Provider 'github-provider' already exists."
+        fi
+
+    - name: Deploy with PDM
+      run: pdm deploy

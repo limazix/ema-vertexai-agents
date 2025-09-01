@@ -15,14 +15,14 @@ from langchain_google_community import BigQueryVectorStore
 from langchain_google_vertexai import VertexAIEmbeddings
 
 embedding = VertexAIEmbeddings(
-    model_name="gemini-embedding-001", project=os.getenv("GOOGLE_CLOUD_PROJECT")
+    model_name="gemini-embedding-001", project=os.getenv("GOOGLE_PROJECT_ID")
 )
 
 vectorstore = BigQueryVectorStore(
-    project_id=os.getenv("GOOGLE_CLOUD_PROJECT"),
-    dataset_name=os.getenv("BG_DATASET_NAME"),
-    table_name=os.getenv("BG_TABLE_NAME"),
-    location=os.getenv("GOOGLE_CLOUD_LOCATION"),
+    project_id=os.getenv("GOOGLE_PROJECT_ID"),
+    dataset_name=os.getenv("BQ_DATASET_NAME"),
+    table_name=os.getenv("BQ_TABLE_NAME"),
+    location=os.getenv("GOOGLE_PROJECT_LOCATION"),
     api_key=os.getenv("GEMINI_API_KEY"),
     embedding=embedding,
 )

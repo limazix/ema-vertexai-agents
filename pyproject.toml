@@ -25,6 +25,7 @@ _.env_file = ".env"
 pre_commit = "git add -i"
 commit = "cz commit"
 serve = "adk web ./analyzer_agent"
+deploy = "python ./analyzer_agent/deploy.py"
 
 [tool.pdm.dev-dependencies]
 docs = [
