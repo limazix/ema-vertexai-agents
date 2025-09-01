@@ -18,8 +18,8 @@ app = AdkApp(
 )
 
 vertexai.init(
-    project=os.getenv("GOOGLE_PROJECT_ID"),
-    location=os.getenv("GOOGLE_PROJECT_LOCATION"),
+    project=os.getenv("PROJECT_ID"),
+    location=os.getenv("PROJECT_LOCATION"),
     staging_bucket=os.getenv("GOOGLE_STORAGE_BUCKET"),
 )
 
