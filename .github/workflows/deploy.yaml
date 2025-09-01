@@ -46,7 +46,7 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: 'projects/$PROJECT_ID/locations/$PROJECT_LOCATION/workloadIdentityPools/github-pool/providers/github-provider'
-        service_account: 'your-service-account-email@your-gcp-project-id.iam.gserviceaccount.com' # Replace with your Service Account email
+        service_account: ${SERVICE_ACCOUNT_EMAIL}
 
     - name: Create GCP Workload Identity Provider if it doesn't exist
       id: create_provider
